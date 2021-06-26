@@ -13,7 +13,7 @@ import java.time.ZoneId;
  * DAO to get an order
  */
 public class GetOrderDao {
-    private String query = "SELECT * FROM orders o WHERE o.order_id = 1";
+    private String query = "SELECT * FROM orders o WHERE o.order_id = ?";
     private Database database;
 
     /**
