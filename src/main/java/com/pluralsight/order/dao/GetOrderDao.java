@@ -13,7 +13,7 @@ import java.time.ZoneId;
  * DAO to get an order
  */
 public class GetOrderDao {
-    private String query = "SELECT * FROM orders o WHERE o.order_id = ?";
+    private String query = "SELECT * FROM orders o WHERE o.order_id = 1";
     private Database database;
 
     /**
@@ -36,12 +36,14 @@ public class GetOrderDao {
              PreparedStatement ps = createPreparedStatement(con, paramsDto.getOrderId());
              ResultSet rs = createResultSet(ps);
         ) {
-            orderDto.setOrderId(10003939393L);
-            orderDto.setCustomerId(19039399L);
-            LocalDate localDate = LocalDate.now();
-            Date currentDate = (Date) Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-            orderDto.setDate(currentDate);
-            orderDto.setStatus("created");
+            if(rs.next()) {
+                orderDto = new OrderDto();
+                orderDto.setOrderId(rs.getLong("order_id"));
+                orderDto.setCustomerId(rs.getLong("order_customer_id"));
+                orderDto.setDate(rs.getDate("order_date"));
+                orderDto.setStatus(rs.getString("order_status"));
+            }
+
         } catch (SQLException ex) {
             ExceptionHandler.handleException(ex);
         }
@@ -58,6 +60,7 @@ public class GetOrderDao {
      */
     private PreparedStatement createPreparedStatement(Connection con, long orderId) throws SQLException {
         PreparedStatement statement = con.prepareStatement(query);
+        statement.setLong(1, orderId);
         return statement;
     }
 
@@ -68,7 +71,7 @@ public class GetOrderDao {
      * @throws SQLException In case of an error
      */
     private ResultSet createResultSet(PreparedStatement ps) throws SQLException {
-        ResultSet resultSet = ps.getResultSet();
+        ResultSet resultSet = ps.executeQuery();
         return resultSet;
     }
 }
